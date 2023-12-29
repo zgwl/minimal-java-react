@@ -30,6 +30,10 @@ Shift + Command + P to invoke the command paletter in VSCode, type **Spring Init
 
 Right-click the Main Java file and select **Run Java**
 
+If getting a **.java is not on the classpath of project** error, do the following:
+
+Press "Ctrl + Shift + P", choose "java : Clean java Language Server workspace".
+
 ### From Command Line
 
 Go to the project root directory, and run the following command
