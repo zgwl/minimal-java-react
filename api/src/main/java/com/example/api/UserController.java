@@ -44,13 +44,13 @@ public class UserController {
 
   @PutMapping("/users/{id}")
   public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
-    // TODO: Finish this function.
-    return ResponseEntity.internalServerError().build();
+    Optional<User> user = userService.updateUser(id, updatedUser);
+    return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
   }
 
   @DeleteMapping("/users/{id}")
   public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-    // TODO: Finish this function.
-    return ResponseEntity.internalServerError().build();
+    userService.deleteUser(id);
+    return ResponseEntity.ok().build();
   }
 }
