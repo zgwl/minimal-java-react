@@ -3,38 +3,37 @@ package com.example.api;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
 
-  private final MockDatabase mockDatabase;
+  private final UserMapper userMapper;
 
-  public UserService(@Autowired MockDatabase mockDatabase) {
-    this.mockDatabase = mockDatabase;
+  public UserService(UserMapper userMapper) {
+    this.userMapper = userMapper;
   }
 
   public List<User> getAllUsers() {
-    return mockDatabase.getUsers();
+    return userMapper.findAll();
   }
 
   public Optional<User> getUserById(Long id) {
-    return mockDatabase.getUserById(id);
+    return Optional.ofNullable(userMapper.findById(id));
   }
 
   public User addUser(User user) {
-    mockDatabase.addUser(user);
+    userMapper.insert(user);
     return user;
   }
 
   public Optional<User> updateUser(Long id, User updatedUser) {
-    // TODO: Finish this function.
-    throw new UnsupportedOperationException();
+    updatedUser.setId(id);
+    userMapper.update(updatedUser);
+    return Optional.of(updatedUser);
   }
 
   public void deleteUser(Long id) {
-    // TODO: Finish this function.
-    throw new UnsupportedOperationException();
+    userMapper.delete(id);
   }
 }

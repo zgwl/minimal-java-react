@@ -41,3 +41,13 @@ Go to the project root directory, and run the following command
 ```shell
 ./mvnw spring-boot:run
 ```
+
+## Setup Supabase Database
+
+- Signup in [Supabase](https://supabase.com/) and create a new project.
+
+- Once the project gets created, go to the **Setting** by clicking the Gear icon from the left navigation bar.
+
+- Click **JDBC** and find the connection string.
+
+- Copy the connection string to the **application.properties**, and save the URL, User, and Password seperately.
