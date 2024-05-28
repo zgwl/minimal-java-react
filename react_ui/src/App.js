@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
+import Example from "./Example";
 
 function App() {
   const [users, setUsers] = useState([]);
@@ -84,6 +85,10 @@ function App() {
           </li>
         ))}
       </ul>
+      <div>
+        <h1>React Example</h1>
+        <Example />
+      </div>
     </div>
   );
 }
