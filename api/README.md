@@ -118,3 +118,31 @@ Using postman to verify the API works as expected.
   - **AWS_ACCESS_KEY_ID**: from AWS setup above
   - **AWS_SECRET_ACCESS_KEY**: from AWS setup above
   - **ECR_REPOSITORY_URI**: from AWS setup above
+
+### Setup the Fly.io
+
+- Install the [flyctl](https://fly.io/docs/hands-on/install-flyctl/).
+
+- Sign in with Fly.io
+
+```shell
+fly auth login
+```
+
+- From the app directory, create a fly.io app (it may ask you to pay $5 per month)
+
+```shell
+fly launch
+```
+
+- From the app directory, deploy the app to fly.io
+
+```shell
+fly deploy
+```
+
+- verify the deployed API at https://**[deployed_name_in_fly_io]**.fly.dev/api/users
+
+- Create a new access token in [Fly.io](https://fly.io/user/personal_access_tokens) and add it to the Github Repository secrets:
+
+  - **FLY_API_TOKEN**: from Fly.io
