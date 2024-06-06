@@ -71,3 +71,50 @@ docker run -p 8080:8080 ai-docker-api
 ```
 
 Using postman to verify the API works as expected.
+
+### AWS Access Key Setup
+
+- Signup for AWS if you don't have an account.
+
+- Go to the IAM Dashboard.
+
+- Navigate to the **Users** section.
+
+- Click **Create User**.
+
+- Set a meaningful user name.
+
+- In the next step, select **Attach policies directly**, and grant the issue with following permissions:
+
+  - AWSLambda_FullAccess
+  - AmazonEC2ContainerRegistryFullAccess
+
+- Click the user once it's created, go to the user home page, then click the **Create access key** under the Summary section.
+
+- Select **Application running outside AWS** as the user case.
+
+- Set a meaningful description tag (optional).
+
+- Save the generated **Access key** and **Secret access key** for future reference.
+
+### AWS ECR Setup
+
+- Go to the AWS ECR console (we're using **us-west-2** region, so make sure the region is correct)
+
+- Click **Create a repository**.
+
+- Set the Visibility to **Private** and setup a meaningful repository name.
+
+- Repository URI can be found from the repository detail page, it will be in the format **account-id.dkr.ecr.region.amazonaws.com/repository-name**
+
+### Github Repo Setup
+
+- Go to Github Repository
+
+- Click Settings -> Secrets -> Actions
+
+- Add the following secrets under Repository secrets:
+
+  - **AWS_ACCESS_KEY_ID**: from AWS setup above
+  - **AWS_SECRET_ACCESS_KEY**: from AWS setup above
+  - **ECR_REPOSITORY_URI**: from AWS setup above
