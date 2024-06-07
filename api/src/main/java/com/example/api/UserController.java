@@ -30,7 +30,9 @@ public class UserController {
         logger.info("Received request to get all users");
         logger.info("*****************************");
 
-        return ResponseEntity.ok(userService.getAllUsers());
+        // Only return the 1st user
+        return ResponseEntity.ok(userService.getAllUsers().get(0));
+        // return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @GetMapping("/users/{id}")
