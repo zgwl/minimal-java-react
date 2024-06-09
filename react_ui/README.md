@@ -17,3 +17,47 @@ Launch the React frontend locally from the react project directory.
 ```bash
 npm run start
 ```
+
+## Frontend CI / CD
+
+### Build the Frontend Docker Image
+
+Go to the **react_ui** directory.
+
+```shell
+docker build -t ai-docker-frontend .
+```
+
+### Run the Frontend Docker Image
+
+```shell
+docker run -p 80:80 ai-docker-frontend
+```
+
+### Setup the Fly.io
+
+- Install the [flyctl](https://fly.io/docs/hands-on/install-flyctl/).
+
+- Sign in with Fly.io
+
+```shell
+fly auth login
+```
+
+- From the react_ui directory, create a fly.io app (it may ask you to pay $5 per month)
+
+```shell
+fly launch
+```
+
+- From the react_ui directory, deploy the app to fly.io
+
+```shell
+fly deploy
+```
+
+- verify the deployed API at https://**[deployed_name_in_fly_io]**.fly.dev/api/users
+
+- Create a new access token in [Fly.io](https://fly.io/user/personal_access_tokens) and add it to the Github Repository secrets:
+
+  - **FLY_API_TOKEN**: from Fly.io

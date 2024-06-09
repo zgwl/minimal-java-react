@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import "./App.css";
 import Example from "./Example";
 
+const API_URL = "https://minimal-java-api.fly.dev/api/users";
+
 function App() {
   const [users, setUsers] = useState([]);
   const [userId, setUserId] = useState("");
@@ -9,14 +11,14 @@ function App() {
   const [userEmail, setUserEmail] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/users")
+    fetch(API_URL)
       .then((response) => response.json())
       .then((data) => setUsers(data))
       .catch((error) => console.error("Error:", error));
   }, []);
 
   const handleCreate = () => {
-    fetch("http://localhost:8080/api/users", {
+    fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: userName, email: userEmail }),
@@ -31,7 +33,7 @@ function App() {
   };
 
   const handleUpdate = () => {
-    fetch(`http://localhost:8080/api/users/${userId}`, {
+    fetch(`${API_URL}/${userId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: userName, email: userEmail }),
@@ -47,7 +49,7 @@ function App() {
   };
 
   const handleDelete = (id) => {
-    fetch(`http://localhost:8080/api/users/${id}`, {
+    fetch(`${API_URL}/${id}`, {
       method: "DELETE",
     })
       .then(() => {
