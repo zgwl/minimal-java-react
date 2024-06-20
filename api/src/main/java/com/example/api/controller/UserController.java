@@ -1,4 +1,4 @@
-package com.example.api;
+package com.example.api.controller;
 
 import java.util.Optional;
 
@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.api.data.User;
+import com.example.api.service.UserService;
+
 @RestController
 @RequestMapping("/api")
 public class UserController {
@@ -26,19 +29,11 @@ public class UserController {
 
     @GetMapping("/users")
     public ResponseEntity<?> getAllUsers() {
-        logger.info("*****************************");
-        logger.info("Received request to get all users");
-        logger.info("*****************************");
-
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @GetMapping("/users/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
-        logger.info("*****************************");
-        logger.info("Received request to get user with ID: {}", id);
-        logger.info("*****************************");
-
         Optional<User> optionUser = userService.getUserById(id);
 
         if (optionUser.isPresent()) {
@@ -52,10 +47,6 @@ public class UserController {
 
     @PostMapping("/users")
     public ResponseEntity<?> createUser(@RequestBody User user) {
-        logger.info("*****************************");
-        logger.info("Received request to create user: {}", user);
-        logger.info("*****************************");
-
         User createdUser = userService.addUser(user);
         logger.info("User created: {}", createdUser);
         return ResponseEntity.ok(createdUser);
@@ -63,10 +54,6 @@ public class UserController {
 
     @PutMapping("/users/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
-        logger.info("*****************************");
-        logger.info("Received request to update user with ID: {}", id);
-        logger.info("*****************************");
-
         Optional<User> user = userService.updateUser(id, updatedUser);
         return user.map(u -> {
             logger.info("User updated: {}", u);
@@ -79,10 +66,6 @@ public class UserController {
 
     @DeleteMapping("/users/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-        logger.info("*****************************");
-        logger.info("Received request to delete user with ID: {}", id);
-        logger.info("*****************************");
-        
         userService.deleteUser(id);
         logger.info("User with ID: {} deleted", id);
         return ResponseEntity.ok().build();

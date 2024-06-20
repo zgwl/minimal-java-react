@@ -1,9 +1,12 @@
-package com.example.api;
+package com.example.api.service;
 
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+
+import com.example.api.data.User;
+import com.example.api.data.UserMapper;
 
 @Service
 public class UserService {
