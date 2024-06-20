@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import Example from "./Example";
 
-const API_URL = "https://minimal-java-api.fly.dev/api/users";
+const REMOTE_API_URL = "https://minimal-java-api.fly.dev/api/users";
+const LOCAL_API_URL = "http://localhost:8080/api/users";
+const API_URL = LOCAL_API_URL;
 
 function App() {
   const [users, setUsers] = useState([]);
@@ -87,10 +88,6 @@ function App() {
           </li>
         ))}
       </ul>
-      <div>
-        <h1>React Example</h1>
-        <Example />
-      </div>
     </div>
   );
 }

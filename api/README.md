@@ -42,6 +42,16 @@ Go to the project root directory, and run the following command
 ./mvnw spring-boot:run
 ```
 
+### Setup Local Environment Variable
+
+Create a `.env` file under the `api` directory, add `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD` accordingly.
+
+Export the variable into the shell before running the application:
+
+```shell
+export $(grep -v '^#' .env | xargs)
+```
+
 ### Setup Supabase Database
 
 - Signup in [Supabase](https://supabase.com/) and create a new project.
