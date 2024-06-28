@@ -1,4 +1,4 @@
-package com.example.api.data;
+package com.example.api.daos;
 
 import lombok.Data;
 
@@ -7,4 +7,5 @@ public class User {
   private Long id;
   private String name;
   private String email;
+  private String password;
 }

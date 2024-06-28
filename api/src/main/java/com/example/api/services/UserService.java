@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.example.api.data.User;
+import com.example.api.daos.User;
 import com.example.api.mappers.UserMapper;
 
 @Service
@@ -23,6 +23,10 @@ public class UserService {
 
   public Optional<User> getUserById(Long id) {
     return Optional.ofNullable(userMapper.findById(id));
+  }
+
+  public Optional<User> getUserByEmail(String email) {
+    return Optional.ofNullable(userMapper.findByEmail(email));
   }
 
   public User addUser(User user) {
