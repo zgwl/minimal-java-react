@@ -1,5 +1,6 @@
 package com.example.api.controllers;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -29,12 +30,12 @@ public class UserController {
   }
 
   @GetMapping("/users")
-  public ResponseEntity<?> getAllUsers() {
+  public ResponseEntity<List<User>> getAllUsers() {
     return ResponseEntity.ok(userService.getAllUsers());
   }
 
   @GetMapping("/users/{id}")
-  public ResponseEntity<?> getUserById(@PathVariable Long id) {
+  public ResponseEntity<User> getUserById(@PathVariable Long id) {
     Optional<User> optionUser = userService.getUserById(id);
 
     if (optionUser.isPresent()) {
@@ -47,14 +48,14 @@ public class UserController {
   }
 
   @PostMapping("/users")
-  public ResponseEntity<?> createUser(@RequestBody User user) {
+  public ResponseEntity<User> createUser(@RequestBody User user) {
     User createdUser = userService.addUser(user);
     logger.info("User created: {}", createdUser);
     return ResponseEntity.ok(createdUser);
   }
 
   @PutMapping("/users/{id}")
-  public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+  public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
     Optional<User> user = userService.updateUser(id, updatedUser);
     return user.map(u -> {
       logger.info("User updated: {}", u);
@@ -66,7 +67,7 @@ public class UserController {
   }
 
   @DeleteMapping("/users/{id}")
-  public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+  public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
     userService.deleteUser(id);
     logger.info("User with ID: {} deleted", id);
     return ResponseEntity.ok().build();
