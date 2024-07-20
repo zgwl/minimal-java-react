@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class ChatResponse {
+public class OpenAIChatResponse {
   private long created;
-  private List<Choice> choices;
+  private List<OpenAIChoice> choices;
 }
