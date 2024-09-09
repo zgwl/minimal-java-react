@@ -24,6 +24,11 @@
       "name": "openai.api.url",
       "type": "java.lang.String",
       "description": "OpenAI API Endpoint URL"
+    },
+    {
+      "name": "openai.system.prompt.file",
+      "type": "java.lang.String",
+      "description": "OpenAI system prompt file"
     }
   ]
 }

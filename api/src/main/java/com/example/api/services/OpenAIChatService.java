@@ -1,6 +1,7 @@
 package com.example.api.services;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -8,7 +9,10 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestTemplate;
 
 import com.example.api.daos.chat.ChatRecord;
@@ -36,13 +40,18 @@ public class OpenAIChatService {
   private final CurrentUserUtil currentUserUtil;
   private final UserChatMapper userChatMapper;
   private final ObjectMapper objectMapper;
+  private final ResourceLoader resourceLoader;
+
+  private String systemPrompt;
 
   public OpenAIChatService(RestTemplate restTemplate, CurrentUserUtil currentUserUtil, UserChatMapper userChatMapper,
-      ObjectMapper objectMapper) {
+      ObjectMapper objectMapper, ResourceLoader resourceLoader) {
     this.restTemplate = restTemplate;
     this.currentUserUtil = currentUserUtil;
     this.userChatMapper = userChatMapper;
     this.objectMapper = objectMapper;
+    this.resourceLoader = resourceLoader;
+    this.systemPrompt = loadSystemPrompt();
   }
 
   public ChatResponseDto chat(String prompt, UUID sessionId) {
@@ -76,7 +85,7 @@ public class OpenAIChatService {
     if (chatRecord == null) {
       OpenAIMessage message = new OpenAIMessage();
       message.setRole("system");
-      message.setContent("Hello! How can I help you today?");
+      message.setContent(systemPrompt);
       previousMessages = List.of(message);
     } else {
       try {
@@ -106,6 +115,21 @@ public class OpenAIChatService {
       }
     } catch (JsonProcessingException e) {
       logger.error("Error converting messages to JSON", e);
+    }
+  }
+
+  private String loadSystemPrompt() {
+    try {
+      Resource resource = resourceLoader.getResource("classpath:system_prompt.txt");
+      if (resource.exists()) {
+        String content = StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
+        logger.info("Manually loaded system prompt: {}", content);
+        return content;
+      } else {
+        throw new RuntimeException("system_prompt.txt not found in classpath.");
+      }
+    } catch (IOException e) {
+      throw new RuntimeException("Error loading system prompt", e);
     }
   }
 }
