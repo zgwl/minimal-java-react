@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.example.api.daos.chat.ChatRecord;
 import com.example.api.daos.chat.ChatResponseDto;
+import com.example.api.daos.chat.DiagnosisDto;
 import com.example.api.daos.chat.OpenAIChatRequest;
 import com.example.api.daos.chat.OpenAIChatResponse;
 import com.example.api.daos.chat.OpenAIMessage;
@@ -29,6 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 public class OpenAIChatService {
   private static final Logger logger = LoggerFactory.getLogger(OpenAIChatService.class);
+  private static final int MAX_RETRY_ATTEMPTS = 3;
 
   @Value("${openai.api.model}")
   private String model;
@@ -41,16 +43,18 @@ public class OpenAIChatService {
   private final UserChatMapper userChatMapper;
   private final ObjectMapper objectMapper;
   private final ResourceLoader resourceLoader;
+  private final DiagnosisService diagnosisService;
 
   private String systemPrompt;
 
   public OpenAIChatService(RestTemplate restTemplate, CurrentUserUtil currentUserUtil, UserChatMapper userChatMapper,
-      ObjectMapper objectMapper, ResourceLoader resourceLoader) {
+      ObjectMapper objectMapper, ResourceLoader resourceLoader, DiagnosisService diagnosisService) {
     this.restTemplate = restTemplate;
     this.currentUserUtil = currentUserUtil;
     this.userChatMapper = userChatMapper;
     this.objectMapper = objectMapper;
     this.resourceLoader = resourceLoader;
+    this.diagnosisService = diagnosisService;
     this.systemPrompt = loadSystemPrompt();
   }
 
@@ -64,17 +68,29 @@ public class OpenAIChatService {
     OpenAIChatRequest chatRequest = this.assembleChatRequest(prompt, userId, sessionId);
     logger.info("Chat request: {}", chatRequest);
 
-    OpenAIChatResponse response = restTemplate.postForObject(url, chatRequest, OpenAIChatResponse.class);
-    logger.info("Chat response: {}", response);
+    for (int attempt = 0; attempt < MAX_RETRY_ATTEMPTS; attempt++) {
+      try {
+        OpenAIChatResponse response = restTemplate.postForObject(url, chatRequest, OpenAIChatResponse.class);
+        if (response != null && response.getChoices() != null && !response.getChoices().isEmpty()) {
+          String content = response.getChoices().get(0).getMessage().getContent();
+          DiagnosisDto diagnosis = diagnosisService.validateAndParseResponse(content);
 
-    String content = "I'm sorry, I don't understand.";
-    if (response != null && response.getChoices() != null && !response.getChoices().isEmpty()) {
-      content = response.getChoices().get(0).getMessage().getContent();
+          this.upsertChatRecord(chatRequest.getMessages(), content, userId, sessionId);
+
+          return new ChatResponseDto(
+              diagnosis.getMessage(),
+              sessionId,
+              diagnosis.isDiagnosisComplete());
+        }
+      } catch (Exception e) {
+        logger.error("Attempt {} failed", attempt + 1, e);
+        if (attempt == MAX_RETRY_ATTEMPTS - 1) {
+          throw e;
+        }
+      }
     }
 
-    this.upsertChatRecord(chatRequest.getMessages(), content, userId, sessionId);
-
-    return new ChatResponseDto(content, sessionId);
+    throw new RuntimeException("Failed to get valid response after maximum retries");
   }
 
   private OpenAIChatRequest assembleChatRequest(String prompt, Long userId, UUID sessionId) {

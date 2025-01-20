@@ -8,9 +8,11 @@ import lombok.Data;
 public class ChatResponseDto {
   private String content;
   private UUID sessionId;
+  private boolean diagnosisComplete;
 
-  public ChatResponseDto(String content, UUID sessionId) {
+  public ChatResponseDto(String content, UUID sessionId, boolean diagnosisComplete) {
     this.content = content;
     this.sessionId = sessionId;
+    this.diagnosisComplete = diagnosisComplete;
   }
 }

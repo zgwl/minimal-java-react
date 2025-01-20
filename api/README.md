@@ -77,7 +77,7 @@ docker build -t ai-docker-api .
 ### Run the Backend Docker Container
 
 ```shell
-docker run -p 8080:8080 ai-docker-api
+docker run -p 8080:8080 --env-file .env ai-docker-api
 ```
 
 Using postman to verify the API works as expected.
