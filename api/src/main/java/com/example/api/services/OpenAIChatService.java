@@ -44,22 +44,32 @@ public class OpenAIChatService {
   private final ObjectMapper objectMapper;
   private final ResourceLoader resourceLoader;
   private final DiagnosisService diagnosisService;
+  private final DiagnosisRecordService diagnosisRecordService;
 
   private String systemPrompt;
 
   public OpenAIChatService(RestTemplate restTemplate, CurrentUserUtil currentUserUtil, UserChatMapper userChatMapper,
-      ObjectMapper objectMapper, ResourceLoader resourceLoader, DiagnosisService diagnosisService) {
+      ObjectMapper objectMapper, ResourceLoader resourceLoader, DiagnosisService diagnosisService,
+      DiagnosisRecordService diagnosisRecordService) {
     this.restTemplate = restTemplate;
     this.currentUserUtil = currentUserUtil;
     this.userChatMapper = userChatMapper;
     this.objectMapper = objectMapper;
     this.resourceLoader = resourceLoader;
     this.diagnosisService = diagnosisService;
+    this.diagnosisRecordService = diagnosisRecordService;
     this.systemPrompt = loadSystemPrompt();
   }
 
   public ChatResponseDto chat(String prompt, UUID sessionId) {
     Long userId = currentUserUtil.getCurrentUserId();
+
+    if (sessionId != null && diagnosisRecordService.isSessionComplete(userId, sessionId)) {
+      return new ChatResponseDto(
+          "This conversation has been completed. Please start a new conversation.",
+          sessionId,
+          true);
+    }
 
     if (sessionId == null) {
       sessionId = UUID.randomUUID();
@@ -72,10 +82,17 @@ public class OpenAIChatService {
       try {
         OpenAIChatResponse response = restTemplate.postForObject(url, chatRequest, OpenAIChatResponse.class);
         if (response != null && response.getChoices() != null && !response.getChoices().isEmpty()) {
+          // Log the content for debugging
+          logger.info("OpenAI response content: {}", response);
+
           String content = response.getChoices().get(0).getMessage().getContent();
           DiagnosisDto diagnosis = diagnosisService.validateAndParseResponse(content);
 
           this.upsertChatRecord(chatRequest.getMessages(), content, userId, sessionId);
+
+          if (diagnosis.isDiagnosisComplete()) {
+            diagnosisRecordService.saveRecord(userId, sessionId, diagnosis);
+          }
 
           return new ChatResponseDto(
               diagnosis.getMessage(),

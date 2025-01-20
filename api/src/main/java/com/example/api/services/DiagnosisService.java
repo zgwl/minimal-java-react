@@ -25,7 +25,6 @@ public class DiagnosisService {
       }
       throw new IllegalStateException("Invalid diagnosis format");
     } catch (JsonProcessingException e) {
-      log.error("Failed to parse diagnosis response", e);
       throw new IllegalStateException("Invalid JSON response");
     }
   }
@@ -33,7 +32,12 @@ public class DiagnosisService {
   private boolean isValidDiagnosis(DiagnosisDto diagnosis) {
     return diagnosis != null
         && diagnosis.getSymptoms() != null
+        && diagnosis.getSymptoms().getPrimary() != null
+        && diagnosis.getSymptoms().getDuration() != null
+        && diagnosis.getSymptoms().getSeverity() != null
         && diagnosis.getAssessment() != null
+        && diagnosis.getAssessment().getPossibleCondition() != null
+        && diagnosis.getAssessment().getConfidence() != null
         && diagnosis.getMessage() != null;
   }
 }
