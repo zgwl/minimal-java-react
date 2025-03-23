@@ -15,6 +15,9 @@ import com.example.api.daos.User;
 import com.example.api.services.AuthenticationService;
 import com.example.api.services.JwtService;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+
 @RequestMapping("/auth")
 @RestController
 public class AuthenticationController {
@@ -38,15 +41,34 @@ public class AuthenticationController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginUserDao loginUserDto) {
+  public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginUserDao loginUserDto,
+      HttpServletResponse response) {
     logger.info("Login request received with the following data: {}", loginUserDto);
     User authenticatedUser = authenticationService.authenticate(loginUserDto);
     String jwtToken = jwtService.generateToken(authenticatedUser);
 
+    Cookie cookie = new Cookie("jwt", jwtToken);
+    cookie.setHttpOnly(true);
+    cookie.setSecure(true);
+    cookie.setPath("/");
+    cookie.setMaxAge((int) (jwtService.getExpirationTime() / 1000));
+    response.addCookie(cookie);
+
     LoginResponse loginResponse = new LoginResponse();
-    loginResponse.setToken(jwtToken);
     loginResponse.setExpiresIn(jwtService.getExpirationTime());
 
     return ResponseEntity.ok(loginResponse);
+  }
+
+  @PostMapping("/logout")
+  public ResponseEntity<Void> logout(HttpServletResponse response) {
+    Cookie cookie = new Cookie("jwt", null);
+    cookie.setHttpOnly(true);
+    cookie.setSecure(true);
+    cookie.setPath("/");
+    cookie.setMaxAge(0);
+    response.addCookie(cookie);
+
+    return ResponseEntity.ok().build();
   }
 }

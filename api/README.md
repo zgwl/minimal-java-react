@@ -156,3 +156,12 @@ fly deploy
 - Create a new access token in [Fly.io](https://fly.io/user/personal_access_tokens) and add it to the Github Repository secrets:
 
   - **FLY_API_TOKEN**: from Fly.io
+
+- Add the env variable to Fly.io's secrets:
+
+```shell
+flyctl secrets set DB_URL=<your_supabase_connection_string> -a <your_app_name>
+flyctl secrets set DB_USERNAME=<your_supabase_username> -a <your_app_name>
+flyctl secrets set DB_PASSWORD=<your_supabase_password> -a <your_app_name>
+flyctl secrets set OPENAI_API_KEY=<your_openai_api_key> -a <your_app_name>
+```

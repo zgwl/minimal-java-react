@@ -1,25 +1,41 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import Chat from "./components/Chat";
 import Login from "./components/Login";
 import Records from "./components/Records";
+import { isAuthenticated, logout } from "./services/authService";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [refreshRecords, setRefreshRecords] = useState(0);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const authenticated = await isAuthenticated();
+      setIsLoggedIn(authenticated);
+      setIsLoading(false);
+    };
+
+    checkAuth();
+  }, []);
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
+  const handleLogout = async () => {
+    await logout();
     setIsLoggedIn(false);
   };
 
   const handleDiagnosisComplete = () => {
     setRefreshRecords((prev) => prev + 1);
   };
+
+  if (isLoading) {
+    return <div className="loading">Loading...</div>;
+  }
 
   if (!isLoggedIn) {
     return <Login onLoginSuccess={handleLoginSuccess} />;

@@ -6,6 +6,7 @@ export const login = async (email, password) => {
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify({ email, password }),
   });
 
@@ -14,14 +15,23 @@ export const login = async (email, password) => {
   }
 
   const data = await response.json();
-  localStorage.setItem("token", data.token);
   return data;
 };
 
-export const logout = () => {
-  localStorage.removeItem("token");
+export const logout = async () => {
+  await fetch(`${API_URLS.auth}/logout`, {
+    method: "POST",
+    credentials: "include",
+  });
 };
 
-export const getToken = () => {
-  return localStorage.getItem("token");
+export const isAuthenticated = async () => {
+  try {
+    const response = await fetch(`${API_URLS.api}/auth-check`, {
+      credentials: "include",
+    });
+    return response.ok;
+  } catch (error) {
+    return false;
+  }
 };

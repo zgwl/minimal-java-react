@@ -17,6 +17,7 @@ import com.example.api.services.JwtService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -42,17 +43,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       @NonNull HttpServletRequest request,
       @NonNull HttpServletResponse response,
       @NonNull FilterChain filterChain) throws ServletException, IOException {
-    final String authHeader = request.getHeader("Authorization");
 
-    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+    final String authHeader = request.getHeader("Authorization");
+    String jwt = null;
+
+    if (authHeader != null && authHeader.startsWith("Bearer ")) {
+      jwt = authHeader.substring(7);
+    } else {
+      Cookie[] cookies = request.getCookies();
+      if (cookies != null) {
+        for (Cookie cookie : cookies) {
+          if ("jwt".equals(cookie.getName())) {
+            jwt = cookie.getValue();
+            break;
+          }
+        }
+      }
+    }
+
+    // If no JWT found, continue with filter chain
+    if (jwt == null) {
       filterChain.doFilter(request, response);
       return;
     }
 
     try {
-      final String jwt = authHeader.substring(7);
       final String userEmail = jwtService.extractUsername(jwt);
-
       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
       if (userEmail != null && authentication == null) {

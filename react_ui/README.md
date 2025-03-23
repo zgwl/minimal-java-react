@@ -61,3 +61,17 @@ fly deploy
 - Create a new access token in [Fly.io](https://fly.io/user/personal_access_tokens) and add it to the Github Repository secrets:
 
   - **FLY_API_TOKEN**: from Fly.io
+
+## Local Development
+
+Point the React app to the local backend by setting the `REACT_APP_API_BASE_URL` environment variable to `http://localhost:8080`.
+
+```shell
+REACT_APP_API_BASE_URL=http://localhost:8080 npm run start
+```
+
+By default, the React app will point to the deployed backend at https://minimal-java-api.fly.dev.
+
+```shell
+npm run start
+```
